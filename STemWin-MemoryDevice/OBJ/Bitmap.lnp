@@ -10,7 +10,6 @@
 "..\obj\ctiic.o"
 "..\obj\ott2001a.o"
 "..\obj\touch.o"
-"..\obj\bitmap.o"
 "..\obj\delay.o"
 "..\obj\sys.o"
 "..\obj\usart.o"

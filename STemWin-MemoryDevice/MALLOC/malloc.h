@@ -22,7 +22,7 @@
 
 //内存参数设定.
 #define MEM_BLOCK_SIZE			32  	  						//内存块大小为32字节
-#define MEM_MAX_SIZE			20*1024  						//最大管理内存 42K  stm32f103rct6最大内存为64k
+#define MEM_MAX_SIZE			25*1024  						//最大管理内存 42K  stm32f103rct6最大内存为64k
 #define MEM_ALLOC_TABLE_SIZE	MEM_MAX_SIZE/MEM_BLOCK_SIZE 	//内存表大小
  
 		 

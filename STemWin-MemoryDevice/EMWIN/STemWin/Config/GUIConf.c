@@ -65,9 +65,9 @@ Purpose     : Display controller initialization
 // Define the available number of bytes available for the GUI
 //
 //#define GUI_NUMBYTES  0x200000
-#define GUI_NUMBYTES  (10*1024)//stmf103rct6 最大管理内存为64K
+#define GUI_NUMBYTES  (20*1024)//stmf103rct6 最大管理内存为64K
 #define GUI_BLOCKSIZE 0x80//块大小
-
+#define GUI_ALLOC_SIZE          30000
 /*********************************************************************
 *
 *       Public code
