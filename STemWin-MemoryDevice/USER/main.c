@@ -21,8 +21,25 @@
 //技术支持：www.openedv.com
 //广州市星翼电子科技有限公司 
 extern void _MY_GetTouchPos(void);
-
-
+	static const GUI_POINT aPoints[] = {   
+	{-50,   0},
+	{-10, 10},
+	{   0, 50},
+	{ 10, 10},
+	{ 50,   0},
+	{ 10,-10},
+	{   0,-50},
+	{-10,-10}
+	};
+	typedef struct 
+	{
+	int XPos_Poly;
+	int YPos_Poly;
+	int XPos_Text;
+	int YPos_Text;
+	GUI_POINT aPointsDest[8];
+	} tDrawItContext;
+ #define SIZE_OF_ARRAY(Array) (sizeof(Array) / sizeof(Array[0]))
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 任务
 #define START_TASK_PRIO      		20        //开始任务的优先级设置为最低
@@ -72,48 +89,55 @@ void main_ui(void)
 	GUI_DrawRoundedRect(0,0,200,200,5);
 	GUI_DrawRoundedFrame(2,2,180,20,5,2);
 }	
-static GUI_RECT Rect = {0, 0, 50, 50};
-static GUI_RECT Rect1 = {0, 0, 50, 50};
-void _Draw(int Delay) 
+
+static void _DrawIt(void * pData) 
 {
-//	GUI_SetPenSize(5); 
-//	GUI_SetColor(GUI_RED);
-//	GUI_DrawLine(Rect.x0 + 3, Rect.y0 + 3, Rect.x1 - 3, Rect.y1 - 3);
-//	GUI_Delay(Delay);
-//	GUI_SetColor(GUI_GREEN);
-//	GUI_DrawLine(Rect.x0 + 3, Rect.y1 - 3, Rect.x1 - 3, Rect.y0 + 3);
-//	GUI_Delay(Delay);
-//	GUI_SetColor(GUI_WHITE);
-//	GUI_SetFont(&GUI_FontComic24B_ASCII);
-//	GUI_SetTextMode(GUI_TM_TRANS);
-//	GUI_DispStringInRect("Closed", &Rect, GUI_TA_HCENTER | GUI_TA_VCENTER);
-//	GUI_Delay(Delay);
+	tDrawItContext * pDrawItContext = (tDrawItContext *)pData;
+	GUI_Clear();
+	GUI_SetFont(&GUI_Font8x8);
+	GUI_SetTextMode(GUI_TM_TRANS);
+
+	GUI_SetColor(GUI_GREEN);
+	GUI_FillRect(pDrawItContext->XPos_Text, 
+	pDrawItContext->YPos_Text - 25,
+	pDrawItContext->XPos_Text + 100,
+	pDrawItContext->YPos_Text - 5);
+
+	GUI_SetColor(GUI_BLUE);
+	GUI_FillPolygon(pDrawItContext->aPointsDest, SIZE_OF_ARRAY(aPoints), 120, 160);
+
 	GUI_SetColor(GUI_RED);
-	GUI_DrawRect(20,20,30,30);
+	GUI_FillRect(140 - pDrawItContext->XPos_Text,  pDrawItContext->YPos_Text + 105,140 - pDrawItContext->XPos_Text + 100,pDrawItContext->YPos_Text + 125);
+
 }
 void memdisplay(void)
 {
- 
-	GUI_MEMDEV_Handle hMem_src,hMem_des;
-	int i;
-	GUI_SetBkColor(GUI_BLUE);
+	tDrawItContext DrawItContext;
+	int i, swap=0;
+	GUI_RECT Rect = {0, 70, 240,320};
+	GUI_SetBkColor(GUI_BLACK);
 	GUI_Clear();
+	GUI_SetColor(GUI_YELLOW);
+	GUI_SetFont(&GUI_Font24_ASCII);
+	GUI_DispStringHCenterAt("MEMDEV_Banding", 120, 5);
+	GUI_SetFont(&GUI_Font16_ASCII);
+	GUI_DispStringHCenterAt("Banding memory device\nwithout flickering", 120, 40);
+	DrawItContext.XPos_Poly = 120;
+	DrawItContext.YPos_Poly = 160;
+	DrawItContext.YPos_Text = 110;
+	while (1) 
+	{
+		swap = ~swap;
+		for (i = 0; i < 20; i++) 
+		{
+			float angle = i * 3.1415926 / 25;
+			DrawItContext.XPos_Text = (swap) ? i*7 : 140 - i*7;
 
-	hMem_src = GUI_MEMDEV_Create(Rect.x0, Rect.y0, Rect.x1 - Rect.x0, Rect.y1 - Rect.y0);   //(1
-	hMem_des = GUI_MEMDEV_Create(Rect1.x0, Rect1.y0, Rect1.x1 - Rect1.x0, Rect1.y1 - Rect1.y0);
-	GUI_MEMDEV_Select(hMem_src);  //
-
-	_Draw(0);             //
-	GUI_MEMDEV_Select(hMem_des);
-	GUI_Clear();
-	GUI_MEMDEV_RotateHQ(hMem_src,hMem_des,0,0,0*1000,1*1000);
-	GUI_MEMDEV_Select(0);     //
-	GUI_MEMDEV_Write(hMem_src);
-  GUI_MEMDEV_WriteAt(hMem_des, 100, 0);
-//	GUI_MEMDEV_CopyToLCDAt(hMem_src,0,0);
-//	GUI_MEMDEV_CopyToLCDAt(hMem_des,100,0);
-//	GUI_MEMDEV_Delete(hMem_des);
-//	GUI_MEMDEV_Delete(hMem_src);
+			GUI_RotatePolygon(DrawItContext.aPointsDest, aPoints, SIZE_OF_ARRAY(aPoints), (swap)?-angle:angle);
+			
+			GUI_MEMDEV_Draw(&Rect,&_DrawIt,&DrawItContext,0,0);
+		}
+	}
 }
 
 int main(void)
