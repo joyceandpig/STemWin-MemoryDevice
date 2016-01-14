@@ -72,65 +72,55 @@ void main_ui(void)
 	GUI_DrawRoundedRect(0,0,200,200,5);
 	GUI_DrawRoundedFrame(2,2,180,20,5,2);
 }	
-static GUI_RECT Rect = {0, 0, 80, 80};
+static GUI_RECT Rect = {0, 0, 50, 50};
+static GUI_RECT Rect1 = {0, 0, 50, 50};
 void _Draw(int Delay) 
 {
-	GUI_SetPenSize(5); 
+//	GUI_SetPenSize(5); 
+//	GUI_SetColor(GUI_RED);
+//	GUI_DrawLine(Rect.x0 + 3, Rect.y0 + 3, Rect.x1 - 3, Rect.y1 - 3);
+//	GUI_Delay(Delay);
+//	GUI_SetColor(GUI_GREEN);
+//	GUI_DrawLine(Rect.x0 + 3, Rect.y1 - 3, Rect.x1 - 3, Rect.y0 + 3);
+//	GUI_Delay(Delay);
+//	GUI_SetColor(GUI_WHITE);
+//	GUI_SetFont(&GUI_FontComic24B_ASCII);
+//	GUI_SetTextMode(GUI_TM_TRANS);
+//	GUI_DispStringInRect("Closed", &Rect, GUI_TA_HCENTER | GUI_TA_VCENTER);
+//	GUI_Delay(Delay);
 	GUI_SetColor(GUI_RED);
-	GUI_DrawLine(Rect.x0 + 3, Rect.y0 + 3, Rect.x1 - 3, Rect.y1 - 3);
-	GUI_Delay(Delay);
-	GUI_SetColor(GUI_GREEN);
-	GUI_DrawLine(Rect.x0 + 3, Rect.y1 - 3, Rect.x1 - 3, Rect.y0 + 3);
-	GUI_Delay(Delay);
-	GUI_SetColor(GUI_WHITE);
-	GUI_SetFont(&GUI_FontComic24B_ASCII);
-	GUI_SetTextMode(GUI_TM_TRANS);
-	GUI_DispStringInRect("Closed", &Rect, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	GUI_Delay(Delay);
+	GUI_DrawRect(20,20,30,30);
 }
 void memdisplay(void)
 {
  
-	GUI_MEMDEV_Handle hMem;
+	GUI_MEMDEV_Handle hMem_src,hMem_des;
 	int i;
 	GUI_SetBkColor(GUI_BLUE);
 	GUI_Clear();
-	GUI_SetColor(GUI_YELLOW);
-	GUI_SetFont(&GUI_Font24_ASCII);
-	GUI_DispStringHCenterAt("MEMDEV_MemDev \n- Sample", 120, 0);GUI_Delay(250);
-	GUI_SetFont(&GUI_Font20_ASCII);
-	GUI_DispStringHCenterAt("Shows the advantage of using\n a memorydevice", 120,50);GUI_Delay(250);
-	GUI_SetFont(&GUI_Font16_ASCII);
-	GUI_DispStringHCenterAt("Draws the picture\nwithout a\nmemory device", 120, 90);GUI_Delay(250);
-	GUI_DispStringHCenterAt("Draws the picture\nusing a\nmemory device", 120, 150);GUI_Delay(250);
 
-		hMem = GUI_MEMDEV_Create(Rect.x0, Rect.y0, Rect.x1 - Rect.x0, Rect.y1 - Rect.y0);   //(1
-	GUI_MEMDEV_Select(hMem);  //?? hMem ?????????????      (2) 
+	hMem_src = GUI_MEMDEV_Create(Rect.x0, Rect.y0, Rect.x1 - Rect.x0, Rect.y1 - Rect.y0);   //(1
+	hMem_des = GUI_MEMDEV_Create(Rect1.x0, Rect1.y0, Rect1.x1 - Rect1.x0, Rect1.y1 - Rect1.y0);
+	GUI_MEMDEV_Select(hMem_src);  //
 
-	_Draw(0);             //????????????????              (3)
-	
-	GUI_MEMDEV_Select(0);     //?? LCD                      (4)
-	while (1) 
-	{
-		for (i = 0; i < 3; i++) 
-		{
-			GUI_Delay(400);
-			GUI_ClearRect(100, Rect.y0, 240, Rect.y1); 
-			GUI_Delay(400);
-			GUI_MEMDEV_CopyToLCDAt(hMem,100, Rect.y0);
-		}
-		GUI_Delay(500);  
-		_Draw(400);
-		GUI_Delay(400);
-		GUI_ClearRect(0, 0, 100, 100);
-	}
+	_Draw(0);             //
+	GUI_MEMDEV_Select(hMem_des);
+	GUI_Clear();
+	GUI_MEMDEV_RotateHQ(hMem_src,hMem_des,0,0,0*1000,1*1000);
+	GUI_MEMDEV_Select(0);     //
+	GUI_MEMDEV_Write(hMem_src);
+  GUI_MEMDEV_WriteAt(hMem_des, 100, 0);
+//	GUI_MEMDEV_CopyToLCDAt(hMem_src,0,0);
+//	GUI_MEMDEV_CopyToLCDAt(hMem_des,100,0);
+//	GUI_MEMDEV_Delete(hMem_des);
+//	GUI_MEMDEV_Delete(hMem_src);
 }
 
 int main(void)
 {
 	BSP_Init();
 //	main_ui();
-//memdisplay();
+memdisplay();
 
 	OSInit();
 	OSTaskCreate(start_task,(void *)0,(OS_STK *)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO);//创建起始任务
@@ -150,9 +140,10 @@ void start_task(void *pdata)
 }
 void led_task(void *pdata)
 {
-	memdisplay();
+	
 	while(1)
 	{
+//		memdisplay();
 		LED0 = !LED0;
 		OSTimeDlyHMSM(0,0,0,500);
 	}
@@ -167,9 +158,14 @@ void touch_task(void *pdata)
 }
 void emwin_demo_task(void *pdata)
 {
+	GUI_DispStringAt("mem use:",0,100);
+		GUI_DispDecAt((u8)mallco_dev.perused,100,100,3);
 	while(1)
 	{
 //		GUIDEMO_Main();
+		
+		GUI_DispDecAt((u8)mallco_dev.perused,100,100,3);
+		
 		OSTimeDlyHMSM(0,0,0,10);
 	}
 }
