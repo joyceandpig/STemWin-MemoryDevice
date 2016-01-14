@@ -90,7 +90,7 @@ void main_ui(void)
 	GUI_DrawRoundedFrame(2,2,180,20,5,2);
 }	
 
-static void _DrawIt(void * pData) 
+void _DrawIt(void * pData) 
 {
 	tDrawItContext * pDrawItContext = (tDrawItContext *)pData;
 	GUI_Clear();
@@ -109,12 +109,19 @@ static void _DrawIt(void * pData)
 	GUI_SetColor(GUI_RED);
 	GUI_FillRect(140 - pDrawItContext->XPos_Text,  pDrawItContext->YPos_Text + 105,140 - pDrawItContext->XPos_Text + 100,pDrawItContext->YPos_Text + 125);
 
-}
+}	
+typedef void (*p) (void *p);
+p p1;
 void memdisplay(void)
 {
 	tDrawItContext DrawItContext;
 	int i, swap=0;
+	
+	void (*pp)(void *p);
+	
 	GUI_RECT Rect = {0, 70, 240,320};
+	pp = _DrawIt;
+	p1 = _DrawIt;
 	GUI_SetBkColor(GUI_BLACK);
 	GUI_Clear();
 	GUI_SetColor(GUI_YELLOW);
@@ -125,6 +132,7 @@ void memdisplay(void)
 	DrawItContext.XPos_Poly = 120;
 	DrawItContext.YPos_Poly = 160;
 	DrawItContext.YPos_Text = 110;
+
 	while (1) 
 	{
 		swap = ~swap;
@@ -135,7 +143,7 @@ void memdisplay(void)
 
 			GUI_RotatePolygon(DrawItContext.aPointsDest, aPoints, SIZE_OF_ARRAY(aPoints), (swap)?-angle:angle);
 			
-			GUI_MEMDEV_Draw(&Rect,&_DrawIt,&DrawItContext,0,0);
+			GUI_MEMDEV_Draw(&Rect,pp,&DrawItContext,0,0);
 		}
 	}
 }
