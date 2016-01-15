@@ -93,7 +93,6 @@ void _Draw(int Delay)
 }
 void memdisplay(void)
 {
- 
 	GUI_MEMDEV_Handle hMem_src,hMem_des;
 	int i;
 	GUI_SetBkColor(GUI_BLUE);
@@ -106,10 +105,11 @@ void memdisplay(void)
 	_Draw(0);             //
 	GUI_MEMDEV_Select(hMem_des);
 	GUI_Clear();
-	GUI_MEMDEV_RotateHQ(hMem_src,hMem_des,0,0,0*1000,1*1000);
+	GUI_MEMDEV_RotateHQ(hMem_src,hMem_des,20,15,45*1000,1*1000);
 	GUI_MEMDEV_Select(0);     //
 	GUI_MEMDEV_Write(hMem_src);
   GUI_MEMDEV_WriteAt(hMem_des, 100, 0);
+	while(1);
 //	GUI_MEMDEV_CopyToLCDAt(hMem_src,0,0);
 //	GUI_MEMDEV_CopyToLCDAt(hMem_des,100,0);
 //	GUI_MEMDEV_Delete(hMem_des);
