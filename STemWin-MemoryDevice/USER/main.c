@@ -92,60 +92,13 @@ void main_ui(void)
 
 void _DrawIt(void * pData) 
 {
-	tDrawItContext * pDrawItContext = (tDrawItContext *)pData;
-	GUI_Clear();
-	GUI_SetFont(&GUI_Font8x8);
-	GUI_SetTextMode(GUI_TM_TRANS);
-
-	GUI_SetColor(GUI_GREEN);
-	GUI_FillRect(pDrawItContext->XPos_Text, 
-	pDrawItContext->YPos_Text - 25,
-	pDrawItContext->XPos_Text + 100,
-	pDrawItContext->YPos_Text - 5);
-
-	GUI_SetColor(GUI_BLUE);
-	GUI_FillPolygon(pDrawItContext->aPointsDest, SIZE_OF_ARRAY(aPoints), 120, 160);
-
-	GUI_SetColor(GUI_RED);
-	GUI_FillRect(140 - pDrawItContext->XPos_Text,  pDrawItContext->YPos_Text + 105,140 - pDrawItContext->XPos_Text + 100,pDrawItContext->YPos_Text + 125);
 
 }	
-typedef void (*p) (void *p);
-p p1;
+
 void memdisplay(void)
 {
-	tDrawItContext DrawItContext;
-	int i, swap=0;
-	
-	void (*pp)(void *p);
-	
-	GUI_RECT Rect = {0, 70, 240,320};
-	pp = _DrawIt;
-	p1 = _DrawIt;
-	GUI_SetBkColor(GUI_BLACK);
-	GUI_Clear();
-	GUI_SetColor(GUI_YELLOW);
-	GUI_SetFont(&GUI_Font24_ASCII);
-	GUI_DispStringHCenterAt("MEMDEV_Banding", 120, 5);
-	GUI_SetFont(&GUI_Font16_ASCII);
-	GUI_DispStringHCenterAt("Banding memory device\nwithout flickering", 120, 40);
-	DrawItContext.XPos_Poly = 120;
-	DrawItContext.YPos_Poly = 160;
-	DrawItContext.YPos_Text = 110;
 
-	while (1) 
-	{
-		swap = ~swap;
-		for (i = 0; i < 20; i++) 
-		{
-			float angle = i * 3.1415926 / 25;
-			DrawItContext.XPos_Text = (swap) ? i*7 : 140 - i*7;
-
-			GUI_RotatePolygon(DrawItContext.aPointsDest, aPoints, SIZE_OF_ARRAY(aPoints), (swap)?-angle:angle);
-			
-			GUI_MEMDEV_Draw(&Rect,pp,&DrawItContext,0,0);
-		}
-	}
+	
 }
 
 int main(void)
